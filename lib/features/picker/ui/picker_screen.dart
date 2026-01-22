@@ -1,101 +1,150 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../services/media_service.dart';
 
-import '../providers/picker_provider.dart';
-import 'widgets/delete_confirmation_dialog.dart';
-
-/// Minimal picker screen with button and status text
-class PickerScreen extends ConsumerWidget {
+class PickerScreen extends ConsumerStatefulWidget {
   const PickerScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final pickerState = ref.watch(pickerProvider);
+  ConsumerState<PickerScreen> createState() => _PickerScreenState();
+}
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Media Picker'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+class _PickerScreenState extends ConsumerState<PickerScreen> {
+  String _status = "Ready to pick";
+  bool _isLoading = false;
+
+  void _setStatus(String status) {
+    if (mounted) {
+      setState(() => _status = status);
+    }
+  }
+
+  void _setLoading(bool loading) {
+    if (mounted) {
+      setState(() => _isLoading = loading);
+    }
+  }
+
+  Future<void> _handlePick() async {
+    _setLoading(true);
+    _setStatus("Picking file...");
+
+    try {
+      final mediaService = ref.read(mediaServiceProvider);
+      final pickedFile = await mediaService.pickMedia();
+
+      if (pickedFile == null) {
+        _setStatus("Pick cancelled");
+        _setLoading(false);
+        return;
+      }
+
+      _setStatus("Copying file...");
+      final copiedFile = await mediaService.processMedia(pickedFile);
+
+      _setStatus("Copied to: ${copiedFile.path}");
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Copy successful: ${copiedFile.path}")),
+        );
+
+        // Prompt for deletion
+        _showDeleteDialog(pickedFile.path!);
+      }
+    } catch (e) {
+      _setStatus("Error: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<void> _showDeleteDialog(String originalPath) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text("Delete Original?"),
+        content: const Text(
+          "File has been safely copied. Do you want to delete the original file from device storage?",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("No, Keep Original"),
+          ),
+          TextButton(
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await _deleteOriginal(originalPath);
+            },
+            child: const Text("Yes, Delete"),
+          ),
+        ],
       ),
+    );
+  }
+
+  Future<void> _deleteOriginal(String originalPath) async {
+    _setLoading(true);
+    _setStatus("Deleting original...");
+    try {
+      await ref.read(mediaServiceProvider).deleteOriginal(originalPath);
+      _setStatus("Original deleted.");
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Original file deleted")));
+      }
+    } catch (e) {
+      _setStatus("Deletion Failed: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Deletion Failed: $e"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Multimedia Picker")),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Status text
               Text(
-                pickerState.statusMessage,
+                _status,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
               const SizedBox(height: 32),
-
-              // Pick file button
-              ElevatedButton(
-                onPressed: pickerState.isLoading
-                    ? null
-                    : () => _handlePickFile(context, ref),
-                child: pickerState.isLoading
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text('Pick Media File'),
-              ),
+              if (_isLoading)
+                const CircularProgressIndicator()
+              else
+                FilledButton.icon(
+                  onPressed: _handlePick,
+                  icon: const Icon(Icons.add_photo_alternate),
+                  label: const Text("Pick Image/Video"),
+                ),
             ],
           ),
         ),
       ),
     );
-  }
-
-  Future<void> _handlePickFile(BuildContext context, WidgetRef ref) async {
-    final notifier = ref.read(pickerProvider.notifier);
-
-    // Step 1: Pick the file
-    await notifier.pickMedia();
-
-    final state = ref.read(pickerProvider);
-    if (state.pickedFilePath == null) {
-      return; // User cancelled or error occurred
-    }
-
-    // Step 2: Copy to storage
-    final copySuccess = await notifier.copyToStorage();
-    if (!copySuccess) {
-      return; // Copy failed
-    }
-
-    // Step 3: Show confirmation dialog for deletion
-    if (!context.mounted) return;
-
-    final shouldDelete = await showDialog<bool>(
-      context: context,
-      builder: (context) => const DeleteConfirmationDialog(),
-    );
-
-    if (shouldDelete == true) {
-      // Step 4: Delete original file
-      final deleteSuccess = await notifier.deleteOriginal();
-
-      if (!deleteSuccess && context.mounted) {
-        // Show snackbar on deletion failure (per contract)
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to delete original file'),
-            backgroundColor: Colors.orange,
-          ),
-        );
-      }
-    } else {
-      // User declined deletion
-      if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Original file kept')));
-      }
-    }
   }
 }
