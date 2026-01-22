@@ -8,12 +8,14 @@ class PickerState {
   final bool isLoading;
   final String statusMessage;
   final String? pickedFilePath;
+  final String? pickedFileUri;
   final String? copiedFilePath;
 
   const PickerState({
     this.isLoading = false,
     this.statusMessage = 'Tap button to pick a file',
     this.pickedFilePath,
+    this.pickedFileUri,
     this.copiedFilePath,
   });
 
@@ -21,12 +23,14 @@ class PickerState {
     bool? isLoading,
     String? statusMessage,
     String? pickedFilePath,
+    String? pickedFileUri,
     String? copiedFilePath,
   }) {
     return PickerState(
       isLoading: isLoading ?? this.isLoading,
       statusMessage: statusMessage ?? this.statusMessage,
       pickedFilePath: pickedFilePath ?? this.pickedFilePath,
+      pickedFileUri: pickedFileUri ?? this.pickedFileUri,
       copiedFilePath: copiedFilePath ?? this.copiedFilePath,
     );
   }
@@ -50,6 +54,8 @@ class PickerNotifier extends Notifier<PickerState> {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.media,
         allowMultiple: false,
+        withData: false, // Don't load file data into memory
+        withReadStream: false,
       );
 
       if (result != null && result.files.isNotEmpty) {
@@ -57,6 +63,7 @@ class PickerNotifier extends Notifier<PickerState> {
         if (file.path != null) {
           state = state.copyWith(
             pickedFilePath: file.path,
+            pickedFileUri: file.identifier, // Capture Content URI
             statusMessage: 'File picked: ${file.name}',
             isLoading: false,
           );
@@ -122,7 +129,10 @@ class PickerNotifier extends Notifier<PickerState> {
 
   /// Deletes the original file after user confirmation
   Future<bool> deleteOriginal() async {
-    if (state.pickedFilePath == null) {
+    // Prefer URI for deletion (required for Android Gallery), fallback to path
+    final targetToDelete = state.pickedFileUri ?? state.pickedFilePath;
+
+    if (targetToDelete == null) {
       state = state.copyWith(statusMessage: 'No original file to delete');
       return false;
     }
@@ -133,15 +143,14 @@ class PickerNotifier extends Notifier<PickerState> {
     );
 
     try {
-      final success = await _fileService.deleteOriginalFile(
-        state.pickedFilePath!,
-      );
+      final success = await _fileService.deleteOriginalFile(targetToDelete);
 
       if (success) {
         state = state.copyWith(
           statusMessage: 'Original file deleted successfully!',
           isLoading: false,
           pickedFilePath: null,
+          pickedFileUri: null,
         );
         return true;
       } else {

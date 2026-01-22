@@ -1,25 +1,26 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path_provider/path_provider.dart';
-import 'fs_service.dart';
+import '../../../core/services/file_service.dart';
 
 // Providers
-final fsServiceProvider = Provider<FsService>((ref) => FsService());
+final fileServiceProvider = Provider<FileService>((ref) => FileService());
 
 final mediaServiceProvider = Provider<MediaService>((ref) {
-  return MediaService(ref.watch(fsServiceProvider));
+  return MediaService(ref.watch(fileServiceProvider));
 });
 
 class MediaService {
-  final FsService _fsService;
+  final FileService _fileService;
 
-  MediaService(this._fsService);
+  MediaService(this._fileService);
 
   Future<PlatformFile?> pickMedia() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.media,
       allowMultiple: false,
+      withData: false,
+      withReadStream: false,
     );
     return result?.files.single;
   }
@@ -29,19 +30,20 @@ class MediaService {
       throw Exception("Picked file path is null");
     }
 
-    final sourceFile = File(pickedFile.path!);
+    // copyFileToStorage now handles storage checks and path generation
+    final destinationPath = await _fileService.copyFileToStorage(
+      pickedFile.path!,
+    );
 
-    // Use app documents directory for safe storage
-    final appDir = await getApplicationDocumentsDirectory();
-    final mediaDir = Directory('${appDir.path}/Media');
-
-    return _fsService.safeCopy(sourceFile, mediaDir);
+    // verifyFileCopy is not strictly needed here as copyFileToStorage throws on error,
+    // but we can sanity check if we want, or just return the file.
+    return File(destinationPath);
   }
 
-  Future<void> deleteOriginal(String originalPath) async {
-    final original = File(originalPath);
-    if (await original.exists()) {
-      await original.delete();
+  Future<void> deleteOriginal(String originalPathOrUri) async {
+    final success = await _fileService.deleteOriginalFile(originalPathOrUri);
+    if (!success) {
+      throw Exception("Failed to delete original file");
     }
   }
 }

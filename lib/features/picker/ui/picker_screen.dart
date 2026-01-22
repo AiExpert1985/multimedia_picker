@@ -50,7 +50,8 @@ class _PickerScreenState extends ConsumerState<PickerScreen> {
         );
 
         // Prompt for deletion
-        _showDeleteDialog(pickedFile.path!);
+        // Pass identifier (Content URI) if available, otherwise path
+        _showDeleteDialog(pickedFile.identifier ?? pickedFile.path!);
       }
     } catch (e) {
       _setStatus("Error: $e");
@@ -64,7 +65,7 @@ class _PickerScreenState extends ConsumerState<PickerScreen> {
     }
   }
 
-  Future<void> _showDeleteDialog(String originalPath) async {
+  Future<void> _showDeleteDialog(String originalUri) async {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -82,7 +83,7 @@ class _PickerScreenState extends ConsumerState<PickerScreen> {
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             onPressed: () async {
               Navigator.of(context).pop();
-              await _deleteOriginal(originalPath);
+              await _deleteOriginal(originalUri);
             },
             child: const Text("Yes, Delete"),
           ),
@@ -91,11 +92,11 @@ class _PickerScreenState extends ConsumerState<PickerScreen> {
     );
   }
 
-  Future<void> _deleteOriginal(String originalPath) async {
+  Future<void> _deleteOriginal(String originalUri) async {
     _setLoading(true);
     _setStatus("Deleting original...");
     try {
-      await ref.read(mediaServiceProvider).deleteOriginal(originalPath);
+      await ref.read(mediaServiceProvider).deleteOriginal(originalUri);
       _setStatus("Original deleted.");
       if (mounted) {
         ScaffoldMessenger.of(

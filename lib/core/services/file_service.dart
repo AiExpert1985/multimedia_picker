@@ -1,9 +1,12 @@
 import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
 /// Service for file operations: copy, verify, delete
 class FileService {
+  static const platform = MethodChannel('com.example.multimedia_picker/media');
+
   /// Gets the app's external storage directory for storing media
   Future<Directory> getStorageDirectory() async {
     // Use external storage for public access
@@ -21,6 +24,17 @@ class FileService {
     return mediaDir;
   }
 
+  /// Gets available free storage space in bytes
+  Future<int> getFreeStorageSpace() async {
+    try {
+      final int freeSpace = await platform.invokeMethod('getStorageFreeSpace');
+      return freeSpace;
+    } on PlatformException catch (e) {
+      print("Failed to get storage space: '${e.message}'.");
+      return 0;
+    }
+  }
+
   /// Copies a file to the app's storage directory
   /// Returns the destination path if successful
   /// Handles duplicates by appending a number: file.ext -> file(1).ext
@@ -28,6 +42,13 @@ class FileService {
     final sourceFile = File(sourcePath);
     if (!await sourceFile.exists()) {
       throw Exception('Source file does not exist');
+    }
+
+    // Check storage space (Buffer of 10MB)
+    final fileSize = await sourceFile.length();
+    final freeSpace = await getFreeStorageSpace();
+    if (freeSpace < fileSize + (10 * 1024 * 1024)) {
+      throw Exception('Insufficient storage space');
     }
 
     final storageDir = await getStorageDirectory();
@@ -71,10 +92,20 @@ class FileService {
     return await file.exists();
   }
 
-  /// Deletes the original file
+  /// Deletes the original file via native platform channel
   /// Returns true if deletion was successful, false otherwise
   Future<bool> deleteOriginalFile(String filePath) async {
     try {
+      // Try native deletion first (for gallery integration)
+      final bool? result = await platform.invokeMethod('deleteOriginal', {
+        'uri': filePath,
+      });
+      if (result == true) {
+        return true;
+      }
+
+      // Fallback to standard Dart delete if native method fails or returns false
+      // This handles cases where filePath is a standard path we own
       final file = File(filePath);
       if (await file.exists()) {
         await file.delete();
@@ -82,6 +113,7 @@ class FileService {
       }
       return false;
     } catch (e) {
+      print("Error deleting file: $e");
       return false;
     }
   }
