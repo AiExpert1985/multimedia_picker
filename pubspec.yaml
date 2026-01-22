@@ -35,6 +35,18 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
 
+  # Cross-platform file picker
+  file_picker: ^10.3.8
+
+  # State management (Riverpod 3.x)
+  flutter_riverpod: ^3.2.0
+
+  # Navigation
+  go_router: ^17.0.1
+
+  # File system paths
+  path_provider: ^2.1.5
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
