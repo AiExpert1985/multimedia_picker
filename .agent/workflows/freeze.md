@@ -1,4 +1,5 @@
-
+---
+description: finalize obelisk task, and make it ready for planning
 ---
 
 **CURRENT STATE: TASK FREEZE**

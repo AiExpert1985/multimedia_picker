@@ -1,4 +1,5 @@
-
+---
+description: Abort obelisk task
 ---
 
 **CURRENT STATE: TASK ABORT**

@@ -1,5 +1,7 @@
-
 ---
+description: Start new obelisk task
+---
+
 
 **CURRENT STATE: TASK DISCOVERY**
 

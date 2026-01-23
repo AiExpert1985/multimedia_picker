@@ -1,3 +1,7 @@
+---
+description: excute obelisk task without pausing for phases
+---
+
 
 ---
 

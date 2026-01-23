@@ -1,4 +1,5 @@
-
+---
+description: start new obelisk project
 ---
 
 **CURRENT STATE: PROJECT DISCOVERY**
