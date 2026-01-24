@@ -27,16 +27,14 @@ For each phase: **Read the prompt file, treat content as instructions, execute.*
 | 4. Archive | `/.agent/workflows/archive-task.md` | `/obelisk/temp-state/` is empty |
 
 **Logic Rules:**
-1.  **Verify:** After each phase, check the "Output Verification" condition.
-2.  **Stop:** If verification fails (or Review = CHANGES REQUIRED), **STOP** immediately.
-3.  **Proceed:** Only if verification passes.
+1.  **Stop on Failure:** If Verification fails (or Review ≠ APPROVED), **STOP** immediately.
+2.  **Stop on Success:** Once Phase 4 (Archive) completes, the workflow ends.
+    * *Do not output a separate completion message.*
 
 ---
 
-## Output
+## Output (Errors Only)
 
-On completion:
-> "✅ TASK COMPLETE — Archived to `/obelisk/tasks/completed/[folder]/`"
-
-On failure:
-> "❌ EXECUTION HALTED at [Phase Name] — [Reason]"
+**If sequence stops early:**
+> "❌ **EXECUTION HALTED at [Phase]**
+> **Reason:** [Missing File / Review Rejected]

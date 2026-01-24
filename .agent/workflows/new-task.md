@@ -328,9 +328,9 @@ If NOT → STOP → `"TASK FREEZE FAILED — task.md not created"`
 [Display complete task.md contents inline]
 
 **Options:**
-`/execute-task` — Auto-run to completion (plan → implement → review → archive)
-`/execute-task-guided` — Stop at plan and review for approval
 `/update-task [changes]` — Modify task definition
+`/execute-task` — Auto-run to completion (plan → implement → review → archive)
+`/plan-task` — run plan phase only and stop
 `/abort-task` — Cancel and archive progress
 
 **STOP. Wait for user command.**
