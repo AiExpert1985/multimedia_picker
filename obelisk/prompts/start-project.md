@@ -1,21 +1,16 @@
 ---
-description: start new obelisk project
+description: Initialize new Obelisk project through discovery
 ---
 
-**CURRENT STATE: PROJECT DISCOVERY**
+**CURRENT STATE: PROJECT START**
 
-Your task is to understand a software project through discussion so it can later be formalized into:
+Two-phase process: Discovery (discussion) → Initialization (file creation).
 
-- **Contracts** — domain/business rules that must always hold (invariants)
-- **Tech Memory** — technical decisions that cannot be reliably inferred from code
+---
 
-This phase is **discussion only**.
+# PHASE 1: DISCOVERY
 
-NO files are created.  
-NO tasks are defined.  
-NO planning or implementation occurs.
-
-Nothing discussed here is authoritative yet.
+Understand the project through discussion. **No files created yet.**
 
 ---
 
@@ -23,60 +18,48 @@ Nothing discussed here is authoritative yet.
 
 - Ask questions only about the project/system
 - Do NOT propose solutions, designs, or code
-- Do NOT make decisions for the user
 - Do NOT assume missing information — surface it explicitly
-- Identify and flag **contract candidates** and **tech-memory candidates**
-- Do NOT write, freeze, or structure tasks
+- Identify **contract candidates** and **tech-memory candidates**
 
 ---
 
-## Question Selection
+## Question Focus
 
-Ask ONLY high-impact questions affecting:
+**Ask about:**
 - System identity (what it is / is not)
 - Core invariants (rules that must always hold)
 - Global constraints (apply to all future work)
 - Safety, data correctness, or irreversible risk
 
-Skip:
+**Skip:**
 - Rare edge cases
 - Speculative future features
-- Hypothetical failure modes
 - Anything deferrable to task-level work
 
 ---
 
-## Discussion Flow
+## Discovery Flow
 
-### 1. Initial Understanding
-- Purpose, users, scope, invariants, safety concerns
+1. **Open:** "Please describe the system you want to build. What problem does it solve, who uses it, and what constraints matter?"
 
-### 2. Refinement (if needed)
-- Clarify ambiguities
-- Resolve critical uncertainties
+2. **Clarify:** Ask follow-up questions until core understanding is clear
 
-### 3. Summary & Confirmation
-- Present summary (format below)
-- User confirms or corrects
-
----
-
-## How to Begin
-
-> "Please describe the system you want to build. What problem does it solve, who uses it, and what constraints matter?"
+3. **Summarize:** Present summary for confirmation
 
 ---
 
 ## Summary Format
-```
+
+```markdown
 **System Identity:**
 - What it is: [description]
 - What it is NOT: [exclusions]
 - Users: [who uses it]
 
 **Contract Candidates:**
-- [Business rule 1]
-- [Business rule 2]
+- Core: [project-wide rules]
+- [Feature A]: [feature-specific rules]
+- [Feature B]: [feature-specific rules]
 
 **Tech-Memory Candidates:**
 - [Technical decision: why]
@@ -88,89 +71,104 @@ Skip:
 
 ---
 
-**CURRENT STATE: PROJECT INITIALIZATION**
+## Discovery Exit
 
-Extract and persist project truth from the completed discovery discussion.
+After user confirms summary:
 
-This phase is **non-interactive and non-creative**.
+> "Summary confirmed. Reply **'initialize'** to create project files."
+
+- **On 'initialize':** → Proceed to Phase 2 (INITIALIZATION)
+- **On corrections:** → Update summary, confirm again
+
+---
+
+# PHASE 2: INITIALIZATION
+
+Extract and persist project truth. **Non-interactive, non-creative.**
+
+---
+
+## Preflight
+
+Check `/obelisk/state/` directory.
+
+- **If files exist:** → "⚠️ Project files already exist. Overwrite? [yes/no]" → Wait
+- **If empty or doesn't exist:** → Proceed
 
 ---
 
 ## Rules
 
-- Use ONLY information explicitly established in the discussion
-- Do NOT invent, infer, generalize, or strengthen intent
-- Do NOT perform task-level planning or execution
+- Use ONLY information explicitly established in discussion
+- Do NOT invent, infer, or strengthen intent
 - Be minimal — over-specification is failure
 - List unresolved items explicitly
-- Do NOT ask questions
 
 ---
 
 ## Required Outputs
 
-Create exactly these files:
+### 1. Contract Files (`/obelisk/state/`)
 
----
-
-### 1. `/obelisk/state/*.domain.md`
-
-Business invariants — what must remain true during execution.
-
-**Include:**
-- System Identity (is / is not / for whom / core promise)
-- Business Invariants (rules that must always hold)
+**`core.domain.md`** — Project-wide invariants:
+- System Identity
+- Global Business Rules
 - Explicit Non-Goals
-- Safety-Critical Rules (if any)
-- Open Questions (unresolved ambiguities)
+- Safety-Critical Rules
+- Open Questions
 
-**Exclude:** UI/UX, architecture, workflows, implementation details
-
-**Rule:** Reflect explicitly agreed intent only — do NOT generalize or strengthen.
-
-note, there should be multiple *.domain.md files, one core.domain.md for project wide 
-Business invariants, and one <feature>.domain.md file per feature, where it contains
-business invariants specific for the feature
+**`[feature].domain.md`** — Per feature identified in discovery:
+- Feature-specific invariants only
+- Create only for features with distinct rules
 
 ---
 
 ### 2. `/obelisk/state/tech-memory.md`
 
-Technical decisions that cannot be reliably inferred from code.
-
-**Include:**
-- Stack choices and rationale (why)
+Technical decisions not inferable from code:
+- Stack choices and rationale
 - Non-obvious architectural decisions
-- Required commands (build / run / test)
-- Constraints not visible from code
-
-**Exclude:** Tasks, plans, speculative decisions, generic best practices
+- Build/run/test commands
+- Constraints not visible in code
 
 ---
 
 ### 3. `/obelisk/tasks/project-backlog.md`
 
-System requirements and follow-up work for humans.
+```markdown
+# Project Backlog
 
-**Structure:**
-1. System Requirements — implementation details and specs
-2. Remaining Tasks — follow-up items
+## System Requirements
+[Implementation details and specs from discussion]
 
-**Rules:**
-- Extract only what was explicitly stated or clearly implied
-- Mark uncertain items with `(?)`
-- Order by expected execution sequence
-- May include UI notes, workflows, validation rules, examples, or testing notes if discussed
+## Tasks
+- [ ] [Task 1]
+- [ ] [Task 2]
+- [ ] [Task 3] (?)  ← uncertain items marked
 
-**Required Footer:**
-> "This file is for human reference only and has NO authority.  
-> Only contracts, frozen tasks, and code define system behavior."
+---
+> This file is for human reference only and has NO authority.
+> Only contracts, frozen tasks, and code define system behavior.
+```
 
 ---
 
-## Completion
+## Verification
 
-After creating all files, output:
+Confirm all files created:
+- `/obelisk/state/core.domain.md`
+- `/obelisk/state/tech-memory.md`
+- `/obelisk/tasks/project-backlog.md`
 
-> "Framework initialization complete. Close this session and start fresh for task work."
+---
 
+## Output
+
+> "✅ PROJECT INITIALIZED
+>
+> Created:
+> - `core.domain.md` + [N] feature contracts
+> - `tech-memory.md`
+> - `project-backlog.md`
+>
+> Next: `/new-task` — Start building the first feature or `/suggest-tasks` — AI suggests tasks based on the project knowledge"
