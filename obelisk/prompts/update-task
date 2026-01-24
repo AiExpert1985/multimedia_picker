@@ -42,15 +42,32 @@ If NOT exist → Output: "No task to update. Use /new-task first."
 
 **Integrate update_description into current task:**
 
-- If update adds to scope → Add to included items
-- If update removes from scope → Move to excluded or remove
-- If update changes goal → Modify goal statement
-- If update adds constraints → Add to constraints
-- If update changes success criteria → Update criteria
+**If update adds to scope:**
+- Add to included items
+- Remove from excluded if it was there
 
-**Create clear, updated task description** that incorporates changes naturally.
+**If update removes from scope:**
+- Remove from included items
+- Add to excluded items (explicitly mark as rejected)
 
-**Do NOT ask questions. Just apply the changes logically.**
+**If update changes goal:**
+- Modify goal statement
+
+**If update adds constraints:**
+- Add to constraints list
+
+**If update changes success criteria:**
+- Update criteria accordingly
+
+**If update rejects something previously included:**
+- Move to excluded list with note: "Explicitly excluded by user"
+
+**Create clear, updated task description** that:
+- Incorporates requested changes
+- Explicitly excludes rejected items
+- Prevents re-asking about rejected items
+
+**Do NOT ask questions. Apply changes logically.**
 
 ### 3. Delete Current Task
 
