@@ -1,5 +1,4 @@
-
----
+how do you evaluate updated final version ?
 
 # Obelisk Framework
 
@@ -14,7 +13,7 @@ Obelisk prevents silent damage by separating **truth**, **intent**, and **execut
 1. **Contracts** — versioned business invariants (authoritative)
 2. **Task** — frozen, human-approved intent (temporary)
 3. **Plan** — mechanical execution steps (temporary)
-4. **Execution** — code and tests (disposable)
+4. **Execution** — code changes (tests/builds only if required by plan)
 
 Higher layers constrain lower ones. Lower layers must never redefine higher ones.
 
@@ -32,18 +31,82 @@ Higher layers constrain lower ones. Lower layers must never redefine higher ones
 
 ---
 
+## Quick Start
+
+**New project:**
+```
+/start-project
+```
+
+**Existing project (no setup needed):**
+```
+/new-task [description]
+/execute
+```
+
+**Not sure what to work on:**
+```
+/suggest-task
+```
+
+---
+
+## Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/start-project` | Initialize Obelisk for a new project (discovery → contracts) |
+| `/suggest-task` | Get task recommendations based on backlog and code state |
+| `/new-task [desc]` | Define a new task through discovery |
+| `/update-task [changes]` | Modify task before execution |
+| `/execute` | Run plan → implement → review → archive automatically |
+| `/abort-task` | Cancel current task and archive progress |
+
+Individual phases can be run manually:
+`/plan-task`, `/implement-task`, `/review-task`, `/archive-task`
+
+---
+
 ## Task Lifecycle
 
 Each task runs in an isolated cycle:
 
-1. **Discovery** — Clarify intent, scope, constraints (no files created)
-2. **Freeze** — Lock task as `task.md`
-3. **Plan** — Generate mechanical execution steps as `plan.md`
-4. **Implementation** — Execute plan literally, record deviations
-5. **Review** — Validate execution against plan and contracts
-6. **Archive & Cleanup** — Store task materials, clean workspace
+```
+/new-task → task.md
+    ↓
+/plan-task → plan.md
+    ↓
+/implement-task → implementation-notes.md + code changes
+    ↓
+/review-task → review-notes.md (APPROVED | CHANGES REQUIRED)
+    ↓
+/archive-task → /completed/ or /rejected/
+```
 
-Tasks and plans are disposable by design.
+`/execute` runs all phases after `/new-task` automatically.
+
+---
+
+## File Structure
+
+```
+/obelisk/
+├── state/
+│   ├── core.domain.md        # Project-wide contracts
+│   ├── [feature].domain.md   # Feature-specific contracts
+│   └── tech-memory.md        # Technical decisions
+├── temp-state/
+│   ├── task.md               # Current task (frozen intent)
+│   ├── plan.md               # Execution plan
+│   ├── implementation-notes.md
+│   └── review-notes.md
+├── tasks/
+│   ├── project-backlog.md    # Human reference only
+│   ├── completed/            # Approved tasks
+│   ├── rejected/             # Tasks needing revision
+│   └── aborted/              # Cancelled tasks
+└── .agent/workflows/         # Prompt files
+```
 
 ---
 
@@ -51,9 +114,8 @@ Tasks and plans are disposable by design.
 
 Contracts evolve only at explicit approval points during Discovery.
 During Execution, contracts are frozen.
+Rejected tasks do not modify contracts or tech-memory.
 All changes tracked via Git.
-
-Tech-memory follows the same approval flow.
 
 ---
 
