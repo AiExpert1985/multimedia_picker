@@ -4,54 +4,66 @@ description: Update existing task based on user feedback
 
 **CURRENT STATE: TASK UPDATE**
 
-Modify the frozen task by merging existing state with new requirements, then re-verify.
+Modify the frozen task by merging existing state with new requirements.
 
 ---
 
-## 1. Entry Point & Input
+## 1. Input
 
-**Check input:**
 - `/update-task [description]` → `update_req` = description
-- `/update-task` (empty) → Ask: "What changes are required?" → Wait → `update_req` = response
+- `/update-task` → Ask: "What changes are required?" → Wait → `update_req` = response
+
+**Guard:** If `update_req` is vague (e.g., "make it better", "improve it"):
+> "Please specify concrete changes (scope, constraints, or success criteria)."
+> → Wait → `update_req` = response
 
 ---
 
-## 2. Context Synthesis (The Fix)
+## 2. Load & Validate
 
-**Action:** Read `/obelisk/temp-state/task.md`.
+Read `/obelisk/temp-state/task.md`.
 
-**IF file missing:**
-- Output: "❌ No task to update. Use `/new-task`." → STOP.
+**IF missing:** → Output: "❌ No task to update. Use `/new-task`." → STOP
 
-**IF file exists:**
-- Construct the **Refinement Prompt** in memory (do not output):
-
-> **ROLE:** You are refining a previously defined task.
->
-> **BASE STATE (Preserve unless modified):**
-> [Insert full content of task.md]
->
-> **MODIFICATION REQUEST (Authority on conflict):**
-> "[Insert update_req]"
->
-> **INSTRUCTION:**
-> 1. Apply the Modification Request to the Base State.
-> 2. If scope is removed, also remove associated constraints/criteria.
-> 3. If scope is added, imply necessary constraints.
-> 4. Resolve conflicts in favor of the Modification Request.
-> 5. Treat the result as the intended task definition.
+**IF exists:** Rename to `/obelisk/temp-state/task.md.backup`
 
 ---
 
-## 3. Reset & Restart
+## 3. Build Refinement Context
 
-**Action:**
-1. **DELETE** `/obelisk/temp-state/task.md` (Clean slate for re-freeze).
-2. **LOAD** `/obelisk/prompts/03-task-discovery-prompt.md`.
+Construct internally (do not output):
+
+> **BASE STATE (preserve unless modified):**
+> [Content of task.md.backup]
+>
+> **MODIFICATION REQUEST (wins on conflict):**
+> "[update_req]"
+>
+> **RULES:**
+> 1. Apply modification to base state
+> 2. Scope removed → remove associated constraints/criteria
+> 3. Scope added → imply necessary constraints
+> 4. Conflicts resolve in favor of modification
+
+Output confirmation:
+> "Updating task: [one-line summary of intended change]. Proceeding..."
+
+---
+
+## 4. Execute Update
+
+**LOAD** `/obelisk/prompts/new-task.md`
 
 **Execution:**
 1. **Inject Input:** Pass the **Refinement Prompt** (from Step 2) as the user's input.
 2. **Adopt Persona:** Switch immediately to Task Discovery.
-3. **Shortcut:** If the update is simple/unambiguous, skip the "Questioning" phase and proceed directly to "Task Freeze".
 
 **GOAL:** Produce a new `task.md` that is a seamless evolution of the old one.
+
+---
+
+## 5. Cleanup
+
+**On successful task.md creation:** Delete `task.md.backup`
+
+**On failure/abort:** Restore `task.md.backup` → `task.md`
