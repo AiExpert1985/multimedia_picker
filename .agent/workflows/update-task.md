@@ -72,9 +72,8 @@ Output once:
 > “Updating task: [one-line summary of change]. Handing off to Discovery...”
 
 **Action:**
-1. **LOAD** `/obelisk/prompts/new-task.md`
+1. **LOAD** `/.agent/workflows/new-task.md`
 2. **INJECT** the **Refinement Context** (from Step 3) as the *initial user input*.
 3. **EXECUTE** the `new-task` prompt immediately.
 
 ---
-
