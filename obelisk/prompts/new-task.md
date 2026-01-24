@@ -98,7 +98,7 @@ After loading contracts, before validation:
 
 ---
 
-### Contract Conflict Detected
+### Contract Conflict
 ```
 ⚠️ **Contract Conflict**
 
@@ -111,7 +111,7 @@ Conflicts with: [domain].domain.md - "[exact contract text]"
    Example: "Remove guest checkout, require login"
 
 2. **Update contract** - [Brief: what exception/change needed]
-   Example: "Add exception: guest checkout allowed for /api/checkout endpoint"
+   Example: "Add exception: guest checkout allowed for /api/checkout"
 
 **Recommendation:** [Option X] because [brief reason based on context]
 Example: "Option 1—preserves security contract, simpler implementation"
@@ -119,26 +119,20 @@ Example: "Option 1—preserves security contract, simpler implementation"
 Choose: [1/2]
 ```
 
-
-**Based on user's choice, adjust understanding and continue to Discovery Questions.**
+Resolve based on choice. Continue checking for other issues.
 
 ---
 
-```markdown
-### Missing Contracts Detected
+### Missing Contracts
 
 **Suggest ONLY for:**
 - Business-critical rules (security, data integrity, compliance)
 - System-wide invariants
 - Permanent architectural constraints
 
-**NOT for:**
-- Implementation details
-- Task-specific logic
-- Obvious rules
+**NOT for:** Implementation details, task-specific logic, obvious rules
 
 **If needed:**
-
 ```
 📋 **Contract Addition**
 
@@ -150,14 +144,13 @@ Suggested for [domain].domain.md:
 Add? [yes/no]
 ```
 
-**High bar: Only contracts future tasks MUST respect.**
-```
-
-**Note user's response and continue to Discovery Questions.**
+Note user's response. Continue checking for other issues.
 
 ---
 
-**All approved changes will be applied during Task Freeze.**
+**Resolve ALL validation issues before proceeding to Discovery Questions.**
+
+**Approved changes applied during Task Freeze.**
 
 ---
 
