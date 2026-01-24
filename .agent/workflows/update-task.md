@@ -55,6 +55,17 @@ Construct internally (do not output):
 
 ---
 
+## 5. Cleanup
+
+- **On Success (Task Freeze Complete):**
+  - Delete `/obelisk/temp-state/task.md.backup`
+
+- **On Abort/Failure:**
+  - Restore `/obelisk/temp-state/task.md.backup` → `/obelisk/temp-state/task.md`
+  - Output: "Obelisk: Task Update Failed."
+
+---
+
 ## 4. Delegate
 
 Output once:
@@ -67,11 +78,3 @@ Output once:
 
 ---
 
-## 5. Cleanup
-
-- **On Success (Task Freeze Complete):**
-  - Delete `/obelisk/temp-state/task.md.backup`
-
-- **On Abort/Failure:**
-  - Restore `/obelisk/temp-state/task.md.backup` → `/obelisk/temp-state/task.md`
-  - Output: "Update aborted. Original task restored."

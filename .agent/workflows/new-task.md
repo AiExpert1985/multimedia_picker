@@ -314,7 +314,7 @@ If NOT → STOP → `"TASK FREEZE FAILED — task.md not created"`
 
 ### 4. Display Task & Options
 
-**Task Ready:**
+**Obelisk: Task Ready:**
 
 **Intent:** [One sentence from Goal]  
 **Scope:** ✓ [Key inclusions] ✗ [Key exclusions]  
@@ -328,9 +328,9 @@ If NOT → STOP → `"TASK FREEZE FAILED — task.md not created"`
 [Display complete task.md contents inline]
 
 **Options:**
-`/execute` — Auto-run to completion (plan → implement → review → archive)
-`/execute-guided` — Stop at plan and review for approval
+`/execute-task` — Auto-run to completion (plan → implement → review → archive)
+`/execute-task-guided` — Stop at plan and review for approval
 `/update-task [changes]` — Modify task definition
-`/abort` — Cancel and archive progress
+`/abort-task` — Cancel and archive progress
 
 **STOP. Wait for user command.**
