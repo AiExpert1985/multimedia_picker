@@ -119,7 +119,6 @@ Example: "Option 1—preserves security contract, simpler implementation"
 Choose: [1/2]
 ```
 
-Continue based on choice.
 
 **Based on user's choice, adjust understanding and continue to Discovery Questions.**
 
@@ -211,7 +210,7 @@ Skip questions if ALL true:
 
 ## Providing Recommendations
 
-**With EVERY question, provide a brief recommendation:**
+**With every decision-based question, provide a brief recommendation:**
 
 **Format:**
 ```
