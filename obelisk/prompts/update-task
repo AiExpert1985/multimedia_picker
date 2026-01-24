@@ -1,10 +1,10 @@
 ---
-description: Update frozen task based on user feedback
+description: Update existing task based on user feedback
 ---
 
 **CURRENT STATE: TASK UPDATE**
 
-Modify frozen task and re-run discovery with changes.
+Modify existing task and re-run discovery with changes.
 
 ---
 
