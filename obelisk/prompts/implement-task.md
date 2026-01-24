@@ -1,5 +1,5 @@
 ---
-description: implement obelisk task 
+description: Implement obelisk task 
 ---
 
 
@@ -20,7 +20,8 @@ Read in order:
 4. `/obelisk/state/tech-memory.md`
 5. `/obelisk/guidelines/ai-engineering.md`
 
-If any missing → STOP → Output: `"IMPLEMENTATION BLOCKED — Missing file: [path]"`
+If `task.md` or `plan.md` is missing → STOP → Output: `"IMPLEMENTATION BLOCKED — Missing file: [path]"`
+if other files are it is OK. Continue with what exists.
 
 ---
 
@@ -51,7 +52,7 @@ Stop immediately if:
 - Any impact on **correctness**, **scope**, or **observable behavior**
 - Any conflict with **contracts** or frozen intent
 
-and load `/obelisk/prompts/09-abort-task.prompt.md` 
+and load `/.agent/workflows/abort-task.md` 
 with: 
 - Aborted at: Implementation
 - Reason: IMPLEMENTATION BLOCKED — [specific reason]
@@ -70,7 +71,7 @@ Proceed (and log in `implementation-notes.md`) for:
 
 **Condition:** Observable behavior unchanged.  
 **If uncertain → STOP.**
-and load `/obelisk/prompts/09-abort-task.prompt.md` 
+and load `/.agent/workflows/abort-task.md`
 with: 
 - Aborted at: Implementation
 - Reason: IMPLEMENTATION BLOCKED — [specific reason]
@@ -111,11 +112,5 @@ If NOT → STOP → Output: `"IMPLEMENTATION FAILED — implementation-notes.md 
 
 > "IMPLEMENTATION COMPLETE
 >
-> Reply **'review'** to validate and archive."
-> Reply **'abort'** to exit and archive progress."
-
-**On "review":** Load `/obelisk/prompts/07-task-review-prompt.md`
-**On "abort":** Load `/obelisk/prompts/abort-task.prompt.md` 
-with: 
-- Aborted at: Planning 
-- Reason: User requested
+> `/review-task` — run review
+> `/abort-task` — Cancel and archive progress

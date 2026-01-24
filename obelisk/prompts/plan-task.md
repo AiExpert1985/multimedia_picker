@@ -40,7 +40,7 @@ STOP immediately if:
 - Cannot respect all constraints
 
 **If blocked:**  
-Load `/obelisk/prompts/09-abort-task.prompt.md` 
+Load `/.agent/workflows/abort-task.md` 
 with: 
 - Aborted at: Planning
 - Reason: PLANNING BLOCKED — [specific reason]
@@ -127,13 +127,5 @@ If either missing → STOP → Output: `"PLANNING FAILED — Required file(s) no
 **Success:**
 > "TASK DEFINED — Files: `task.md`, `plan.md`
 >
-> Reply **'implement'** to execute the plan.
-> Reply **'review'** to validate implementation."
-> Reply **'abort'** to exit and archive progress."
-
-**On "implement":** Load `/obelisk/prompts/06-task-implementation-prompt.md`
-**On "review":** Load `/obelisk/prompts/07-task-review-prompt.md`
-**On "abort":** Load `/obelisk/prompts/abort-task.prompt.md` 
-with: 
-- Aborted at: Planning 
-- Reason: User requested
+> `/implement-task` — run implementation
+> `/abort-task` — Cancel and archive progress

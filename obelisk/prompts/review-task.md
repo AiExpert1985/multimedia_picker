@@ -1,5 +1,5 @@
 ---
-description: review obelisk task
+description: Review obelisk task
 ---
 
 
@@ -19,7 +19,8 @@ Read:
 - `/obelisk/temp-state/implementation-notes.md`
 - `/obelisk/state/*.domain.md`
 
-If any missing → STOP  
+If any of `task.md`, `plan.md`, or `implementation-notes.md` is missing → STOP  
+if `*.domain.md` is missing, it is ok
 Output: `"REVIEW BLOCKED — Missing file: [path]"`
 
 ---
@@ -86,4 +87,4 @@ Confirm `/obelisk/temp-state/review-notes.md` exists.
 If NOT → STOP → Output: `"REVIEW FAILED — review-notes.md not created"`
 
 After successfully creating `review-notes.md`:
-Load `/obelisk/prompts/08-archive-and-cleanup-prompt.md`
+Load `/.agent/workflows/archive-task.md`
