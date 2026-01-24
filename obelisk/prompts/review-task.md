@@ -52,6 +52,11 @@ Any failure → **CHANGES REQUIRED**
 4. **Scope:** Only listed files changed?
 5. **Implementation Notes:** Any blocking item present?
 
+Documented divergences in implementation-notes.md
+are acceptable if they do not violate task intent,
+scope, or contracts.
+Undocumented divergences are failures.
+
 ---
 
 ## Review Output
@@ -77,6 +82,9 @@ Write to: `/obelisk/temp-state/review-notes.md`
 ```
 
 **MANDATORY: Create this file before proceeding to archive.**
+
+Review does not modify code or plans.
+All outcomes proceed to archive.
 
 ---
 
