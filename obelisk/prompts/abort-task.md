@@ -1,41 +1,73 @@
 ---
-description: Abort obelisk task
+description: Archive current task state and clean workspace
 ---
 
 **CURRENT STATE: TASK ABORT**
 
-Archive current progress and clean workspace.
+Archive current task state and clean workspace.
 
 ---
 
-## Inputs
+## 1. Input
 
-- **Aborted at:** [phase]
-- **Reason:** [blocker or "User requested"]
+`/abort [reason]`
+
+- If `reason` provided → **Aborted By:** SYSTEM, **Reason:** [reason]
+- If no `reason` → **Aborted By:** USER, **Reason:** "User requested"
 
 ---
 
-## Steps
+## 2. Preflight
 
-1. Create `/obelisk/tasks/aborted/YYYYMMDD-short-task-name/`
+Check `/obelisk/temp-state/`.
 
-2. Copy from `/obelisk/temp-state/` (if exist):
-   - `task.md`
-   - `plan.md`
-   - `implementation-notes.md`
+**If empty:**
+> "⚠️ No active task. Workspace is clean." → STOP
 
-3. Create `abort-reason.md`:
+**If files exist:**
+
+1. **Detect phase** from files present:
+   - Only `task.md` → Phase: PLANNING
+   - `task.md` + `plan.md` → Phase: IMPLEMENTATION  
+   - `task.md` + `plan.md` + `implementation-notes.md` → Phase: REVIEW
+   - No `task.md` → Phase: DISCOVERY
+
+2. **Extract task name:**
+   - From `task.md` header if present
+   - Else → `draft-context`
+
+3. **Set archive path:**  
+   `/obelisk/tasks/aborted/YYYYMMDD-[task-name]/`
+
+---
+
+## 3. Archive
+
+1. Create archive directory
+
+2. Move ALL files from `/obelisk/temp-state/` into archive
+
+3. Create `abort-summary.md` in archive:
+
 ```markdown
-   **Aborted at:** [Phase]
-   **Reason:** [Description]
+**Date:** [YYYY-MM-DD HH:MM]
+**Phase:** [DISCOVERY | PLANNING | IMPLEMENTATION | REVIEW]
+**Aborted By:** [USER | SYSTEM]
+**Reason:** [One sentence]
 ```
 
-4. Clean `/obelisk/temp-state/`
-
 ---
 
-## Output
+## 4. Output
 
-> "TASK ABORTED — Saved to `/obelisk/tasks/aborted/[folder]`
-> 
-> System ready for next task."
+```
+🛑 TASK ABORTED
+
+Archived: /obelisk/tasks/aborted/YYYYMMDD-[task-name]/
+Phase: [Phase]
+Reason: [Reason]
+
+System ready for next task.
+```
+
+STOP.
