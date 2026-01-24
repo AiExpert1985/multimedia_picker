@@ -75,4 +75,10 @@ Delete `/obelisk/temp-state/task.md`
 
 ### 4. Run Discovery with Updated Task
 
-Execute: `/new-task [updated task description from step 2]`
+**ACTION:**
+1. Read the file `/obelisk/prompts/03-task-discovery-prompt.md`.
+2. **Adopt the persona** and rules defined in that file immediately.
+3. **Inject Input:** Treat the updated task description (from Step 2) as the user's initial input.
+4. **Execute:** Begin the "Preflight" and "Reconnaissance" phases defined in that file.
+
+*Do not ask the user to type /new-task. Just start the process.*
