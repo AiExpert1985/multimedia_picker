@@ -11,27 +11,25 @@ Run planning → implementation → review → archive sequentially.
 ## Preflight
 
 Check `/obelisk/temp-state/task.md` exists.
-
 - **If missing:** → "❌ No task defined. Use `/new-task` first." → STOP
 
 ---
 
 ## Execution Sequence
 
-Run each phase in order. After each, verify its output file exists before proceeding.
+For each phase: **Read the prompt file, treat content as instructions, execute.**
 
-| Phase | Prompt | Output File |
-|-------|--------|-------------|
-| 1. Plan | `/obelisk/prompts/plan.md` | `plan.md` |
-| 2. Implement | `/obelisk/prompts/implement.md` | `implementation-notes.md` |
-| 3. Review | `/obelisk/prompts/review.md` | `review-notes.md` |
-| 4. Archive | `/obelisk/prompts/archive.md` | *(clears temp-state)* |
+| Phase | Prompt | Output Verification |
+|-------|--------|---------------------|
+| 1. Plan | `/.agent/workflows/plan-task.md` | `plan.md` exists |
+| 2. Implement | `/.agent/workflows/implement-task.md` | `implementation-notes.md` exists |
+| 3. Review | `/.agent/workflows/review-task.md` | `review-notes.md` contains "APPROVED" |
+| 4. Archive | `/.agent/workflows/archive-task.md` | `/obelisk/temp-state/` is empty |
 
-**After each phase:**
-- Verify output file exists in `/obelisk/temp-state/`
-- If missing → STOP
-- If phase issued STOP → STOP
-- Otherwise → proceed to next phase
+**Logic Rules:**
+1.  **Verify:** After each phase, check the "Output Verification" condition.
+2.  **Stop:** If verification fails (or Review = CHANGES REQUIRED), **STOP** immediately.
+3.  **Proceed:** Only if verification passes.
 
 ---
 
@@ -41,4 +39,4 @@ On completion:
 > "✅ TASK COMPLETE — Archived to `/obelisk/tasks/completed/[folder]/`"
 
 On failure:
-> "❌ EXECUTION HALTED at [phase] — [reason]"
+> "❌ EXECUTION HALTED at [Phase Name] — [Reason]"
