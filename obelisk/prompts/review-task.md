@@ -1,8 +1,5 @@
 ---
-description: Review obelisk task
----
-
-
+description: Validate implementation matches frozen intent
 ---
 
 **CURRENT STATE: TASK REVIEW**
@@ -11,17 +8,17 @@ Role: **Reviewer** — Validate execution matches frozen intent.
 
 ---
 
-## Review Inputs
+## Preflight
 
-Read:
+**Required — STOP if missing:**
 - `/obelisk/temp-state/task.md`
 - `/obelisk/temp-state/plan.md`
 - `/obelisk/temp-state/implementation-notes.md`
-- `/obelisk/state/*.domain.md`
 
-If any of `task.md`, `plan.md`, or `implementation-notes.md` is missing → STOP  
-if `*.domain.md` is missing, it is ok
-Output: `"REVIEW BLOCKED — Missing file: [path]"`
+→ "❌ REVIEW BLOCKED — Missing file: [path]"
+
+**Read if present:**
+- `/obelisk/state/*.domain.md` (contracts)
 
 ---
 
@@ -35,10 +32,9 @@ Output: `"REVIEW BLOCKED — Missing file: [path]"`
 
 **MUST NOT:**
 - Propose fixes or alternatives
-- Modify files
+- Modify any files
 - Re-run planning or implementation
 - Approve undocumented behavior
-- Evaluate style or performance
 
 ---
 
@@ -46,24 +42,17 @@ Output: `"REVIEW BLOCKED — Missing file: [path]"`
 
 Any failure → **CHANGES REQUIRED**
 
-1. **Task → Plan:** All requirements covered?
-2. **Plan → Implementation:** Executed as specified?
+1. **Task → Plan:** All success criteria mapped to steps?
+2. **Plan → Code:** All steps executed as specified?
 3. **Contracts:** All preserved?
-4. **Scope:** Only listed files changed?
-5. **Implementation Notes:** Any blocking item present?
-
-Documented divergences in implementation-notes.md
-are acceptable if they do not violate task intent,
-scope, or contracts.
-Undocumented divergences are failures.
+4. **Scope:** Only files listed in plan were changed?
+5. **Divergences:** Any noted in implementation-notes.md justified?
 
 ---
 
 ## Review Output
 
-Write to: `/obelisk/temp-state/review-notes.md`
-### Format
-
+Write to `/obelisk/temp-state/review-notes.md`:
 
 ```markdown
 # Review Outcome
@@ -71,28 +60,32 @@ Write to: `/obelisk/temp-state/review-notes.md`
 **Status:** APPROVED | CHANGES REQUIRED
 
 ## Summary
-[Factual summary of findings]
+[2-3 sentence factual summary]
 
-## Notes
-- [Issue or confirmation with reference]
+## Checklist Results
+1. Task → Plan: ✓ | ✗ [detail if failed]
+2. Plan → Code: ✓ | ✗
+3. Contracts: ✓ | ✗
+4. Scope: ✓ | ✗
+5. Divergences: ✓ | ✗
 
 ## Deferred Items (if any)
 - [Item → requires new task]
-
 ```
 
-**MANDATORY: Create this file before proceeding to archive.**
-
-Review does not modify code or plans.
-All outcomes proceed to archive.
 
 ---
 
-## Review Exit
+## Verification
 
-**VERIFICATION (MANDATORY):**
 Confirm `/obelisk/temp-state/review-notes.md` exists.
-If NOT → STOP → Output: `"REVIEW FAILED — review-notes.md not created"`
 
-After successfully creating `review-notes.md`:
+- **If missing:** → "❌ REVIEW FAILED — review-notes.md not created" → STOP
+
+**Success (either status):**
+> "✓ REVIEW COMPLETE — Status: [APPROVED|CHANGES REQUIRED]"
+
+
+*Review always proceeds to archive regardless of status.*
+
 Load `/.agent/workflows/archive-task.md`
