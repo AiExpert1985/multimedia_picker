@@ -20,13 +20,16 @@ Role: **Reviewer** — Validate execution matches frozen intent.
 **Read if present:**
 - `/obelisk/state/*.domain.md` (contracts)
 
+**Read for verification:**
+- All source files listed in `plan.md` under "Files to Modify" and "Files to Create"
+
 ---
 
 ## Review Rules
 
 **MUST:**
 - Review ONLY changes for this task
-- Base evaluation on written files only
+- Verify actual code matches plan (not just notes)
 - Use frozen task as intent — do NOT reinterpret
 - Treat contracts as immutable truth
 
@@ -34,7 +37,7 @@ Role: **Reviewer** — Validate execution matches frozen intent.
 - Propose fixes or alternatives
 - Modify any files
 - Re-run planning or implementation
-- Approve undocumented behavior
+- Approve based on notes alone — verify code
 
 ---
 
@@ -43,8 +46,8 @@ Role: **Reviewer** — Validate execution matches frozen intent.
 Any failure → **CHANGES REQUIRED**
 
 1. **Task → Plan:** All success criteria mapped to steps?
-2. **Plan → Code:** All steps executed as specified?
-3. **Contracts:** All preserved?
+2. **Plan → Code:** All steps actually implemented in source files?
+3. **Contracts:** All preserved in actual code?
 4. **Scope:** Only files listed in plan were changed?
 5. **Divergences:** Any noted in implementation-notes.md justified?
 
@@ -69,10 +72,12 @@ Write to `/obelisk/temp-state/review-notes.md`:
 4. Scope: ✓ | ✗
 5. Divergences: ✓ | ✗
 
+## Files Verified
+- [list of source files actually reviewed]
+
 ## Deferred Items (if any)
 - [Item → requires new task]
 ```
-
 
 ---
 
@@ -82,9 +87,8 @@ Confirm `/obelisk/temp-state/review-notes.md` exists.
 
 - **If missing:** → "❌ REVIEW FAILED — review-notes.md not created" → STOP
 
-**Success (either status):**
+**Success:**
 > "✓ REVIEW COMPLETE — Status: [APPROVED|CHANGES REQUIRED]"
-
 
 *Review always proceeds to archive regardless of status.*
 
