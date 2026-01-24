@@ -1,0 +1,56 @@
+---
+description: Update frozen task based on user feedback
+---
+
+**CURRENT STATE: TASK UPDATE**
+
+Modify frozen task and re-run discovery with changes.
+
+---
+
+## Entry Point Detection
+
+**Check if update description was provided:**
+
+**IF user provided update:**
+```
+/update-task Add camera support alongside gallery picker
+```
+- Extract update_description = "Add camera support alongside gallery picker"
+- Proceed to Task Update
+
+**IF no description:**
+```
+/update-task
+```
+- Output: "What changes should be made to the task?"
+- Wait for response
+- Set update_description = [response]
+- Proceed to Task Update
+
+---
+
+## Task Update
+
+### 1. Load Current Task
+
+Read `/obelisk/temp-state/task.md`
+
+If NOT exist → Output: "No task to update. Use /new-task first."
+
+### 2. Delete Current Task
+
+Delete `/obelisk/temp-state/task.md`
+
+### 3. Create Combined Description
+```
+Original task:
+[Content from task.md]
+
+Requested changes:
+[update_description]
+```
+
+### 4. Run Discovery
+
+Execute: `/new-task [combined description from step 3]`

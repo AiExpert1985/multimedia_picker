@@ -1,3 +1,7 @@
+---
+description: Creates a new Obelisk task
+---
+
 **CURRENT STATE: TASK DISCOVERY**
 
 Define a new task through discussion.
