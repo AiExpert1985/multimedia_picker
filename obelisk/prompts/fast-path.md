@@ -1,54 +1,142 @@
 ---
-description: excute obelisk task without pausing for phases
+description: Auto-execute task through all phases (plan → implement → review → archive)
 ---
 
+**CURRENT STATE: EXECUTE ORCHESTRATOR**
 
----
+Run all remaining phases sequentially without user intervention.
 
-**CURRENT STATE: FAST PATH EXECUTION**
-
-Automatically execute the remaining Obelisk task workflow in sequence without showing user prompts or waiting for user input
-
----
-
-## Execution Mode
-
-This is a **non-interactive execution mode**.
-
-- Do NOT display user instructions even if the loaded prompt has user input request
-- Do NOT wait for user input
-- Do NOT branch on user responses
-- Execute prompts sequentially
+> **This is an orchestrator, not a phase.**
+> It loads and runs phase prompts in sequence. It does NOT perform phase logic itself.
 
 ---
 
-## Execution Order (MANDATORY)
+## 1. Input
 
-Execute the following prompts **in order**, stopping immediately if any prompt blocks, aborts, or fails:
-
-1. `/obelisk/prompts/04-task-freeze-prompt.md`
-2. `/obelisk/prompts/06-task-implementation-prompt.md`
-3. `/obelisk/prompts/07-task-review-prompt.md`
+`/execute` — Run all phases automatically
+`/execute-guided` — Pause after each phase for approval
 
 ---
 
-## Rules
+## 2. Preflight
 
-- Do NOT skip, reorder, or merge steps
-- Respect STOP and ABORT semantics inside each prompt
-- If any prompt outputs BLOCKED or ABORTED → stop chaining immediately
-- Do NOT reinterpret outputs between prompts
-- Do NOT introduce new decisions
+**Verify task exists:**
+- Check `/obelisk/temp-state/task.md` exists
+- If missing → "❌ No task defined. Use `/new-task` first." → STOP
+
+**Detect current phase from file state:**
+
+| Files Present | Current Phase | Next Action |
+|---------------|---------------|-------------|
+| Only `task.md` | PLANNING | Run /plan |
+| `task.md` + `plan.md` | IMPLEMENTATION | Run /implement |
+| Above + `implementation-notes.md` | REVIEW | Run /review |
+| Above + `review-notes.md` | ARCHIVE | Run /archive |
 
 ---
 
-## Final Output
+## 3. Execution Loop
 
-If all steps complete successfully, output exactly:
+```
+WHILE not archived:
+    1. Detect current phase (from file state)
+    2. Load and execute phase prompt
+    3. Verify phase output file was created
+    4. IF guided mode AND phase complete:
+         → Output phase summary
+         → "Continue? [yes/no/abort]"
+         → Wait for confirmation
+    5. IF phase BLOCKED or FAILED:
+         → Output error
+         → STOP (do not continue to next phase)
+    6. Advance to next phase
+```
 
-FAST PATH COMPLETE — TASK ARCHIVED
+**Phase prompt paths:**
+- Planning: `/obelisk/prompts/plan.md`
+- Implementation: `/obelisk/prompts/implement.md`
+- Review: `/obelisk/prompts/review.md`
+- Archive: `/obelisk/prompts/archive.md`
 
-css
-Copy code
+---
 
-STOP.
+## 4. Phase Transition Rules
+
+**Transitions are file-gated, not LLM-decided.**
+
+| Transition | Required File | Required Content |
+|------------|---------------|------------------|
+| → Planning | `task.md` | Goal, Scope, Success Criteria |
+| → Implementation | `plan.md` | Execution Steps, Acceptance Criteria |
+| → Review | `implementation-notes.md` | Any content (even "No divergences") |
+| → Archive | `review-notes.md` | Status: APPROVED or CHANGES REQUIRED |
+
+**IF required file missing after phase execution:**
+→ "❌ EXECUTION HALTED — [phase] failed to produce [file]"
+→ STOP
+
+---
+
+## 5. Error Handling
+
+**On STOP condition from any phase:**
+- Do NOT attempt recovery
+- Do NOT continue to next phase
+- Output the phase's error message verbatim
+- Suggest: "Run `/abort` to archive progress, or fix the issue and run `/execute` again."
+
+**On CHANGES REQUIRED from review:**
+- Archive proceeds normally (task is complete, just not approved)
+- Final output notes the status
+
+---
+
+## 6. Output
+
+**During execution (per phase):**
+```
+⏳ [Phase]: Starting...
+✓ [Phase]: Complete → [key output file]
+```
+
+**On completion:**
+```
+✅ TASK EXECUTED
+
+Phases completed: Planning → Implementation → Review → Archive
+Final status: [APPROVED | CHANGES REQUIRED]
+Archive: /obelisk/tasks/completed/YYYYMMDD-[task-name]/
+
+System ready for next task.
+```
+
+**On guided mode, after each phase:**
+```
+✓ [Phase] complete.
+
+Summary: [2-3 sentence phase outcome]
+Output: [file path]
+
+Continue to [next phase]? [yes/no/abort]
+```
+
+---
+
+## 7. Critical Rules
+
+1. **DO NOT improvise phase logic** — Load and execute the actual phase prompt
+2. **DO NOT skip file verification** — Each phase must produce its output file
+3. **DO NOT continue after STOP** — Errors halt the entire chain
+4. **DO NOT merge phases** — Each phase runs as a distinct unit
+5. **Treat phase prompts as authoritative** — This orchestrator only sequences them
+
+---
+
+## 8. Windsurf/Cascade Integration Note
+
+In Windsurf, this workflow can call sub-workflows:
+- "Call /plan" executes the planning workflow
+- "Call /implement" executes the implementation workflow
+- etc.
+
+The orchestrator's job is sequencing and verification, not reimplementing phase logic.
