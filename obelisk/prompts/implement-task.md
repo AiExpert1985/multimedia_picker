@@ -1,27 +1,22 @@
 ---
-description: Implement obelisk task 
----
-
-
+description: Execute the planned task
 ---
 
 **CURRENT STATE: TASK IMPLEMENTATION**
 
-Execute the approved plan **sequentially and deterministically**, with **mechanical discretion only**.
+Execute the approved plan sequentially and deterministically.
 
 ---
 
 ## Preflight
 
-Read in order:
-1. `/obelisk/state/*.domain.md`
-2. `/obelisk/temp-state/plan.md`
-3. `/obelisk/temp-state/task.md`
-4. `/obelisk/state/tech-memory.md`
-5. `/obelisk/guidelines/ai-engineering.md`
+**Required — STOP if missing:**
+- `/obelisk/temp-state/task.md`
+- `/obelisk/temp-state/plan.md`
 
-If `task.md` or `plan.md` is missing → STOP → Output: `"IMPLEMENTATION BLOCKED — Missing file: [path]"`
-if other files are it is OK. Continue with what exists.
+**Read if present:**
+- `/obelisk/state/*.domain.md` (contracts)
+- `/obelisk/state/tech-memory.md`
 
 ---
 
@@ -37,62 +32,52 @@ if other files are it is OK. Continue with what exists.
 - Reinterpret, reorder, skip, or merge steps
 - Fix plan errors silently
 - Redesign or refactor beyond plan
-- Modify contracts, tech memory, or context files
+- Modify contracts or tech-memory files
 - Ask questions
 - Continue after a STOP condition
-
-**STOP conditions apply only to semantic, scope, contract, or authority violations.**
 
 ---
 
 ## When to STOP
 
-Stop immediately if:
-- Ambiguity about **what** to build (not just how)
-- Any impact on **correctness**, **scope**, or **observable behavior**
-- Any conflict with **contracts** or frozen intent
-
-and load `/.agent/workflows/abort-task.md` 
-with: 
-- Aborted at: Implementation
-- Reason: IMPLEMENTATION BLOCKED — [specific reason]
+STOP and load `/.agent/workflows/abort-task.md` if:
+- Ambiguity about **what** to build
+- Impact on **correctness**, **scope**, or **observable behavior**
+- Conflict with **contracts** or frozen intent
+- **Uncertain** whether a change is safe
 
 ---
 
 ## Allowed Without Stopping
 
-Proceed (and log in `implementation-notes.md`) for:
-- Formatting / whitespace
+Proceed (and log in implementation-notes.md) for:
+- Formatting / whitespace changes
 - Variable renames (same meaning)
 - Import reordering
 - Syntax/API adjustments required by actual code state
 - Defensive null checks matching existing patterns
 - Mechanical micro-details fully determined by the plan
 
-**Condition:** Observable behavior unchanged.  
-**If uncertain → STOP.**
-and load `/.agent/workflows/abort-task.md`
-with: 
-- Aborted at: Implementation
-- Reason: IMPLEMENTATION BLOCKED — [specific reason]
+**Condition:** Observable behavior unchanged.
 
 ---
 
-## Implementation Notes (MANDATORY)
+## Implementation Notes
 
 Create `/obelisk/temp-state/implementation-notes.md` after implementation.
 
-**If divergences occurred:**
-- What the plan specified
-- What was done instead
-- Why (mechanically necessary)
+**If divergences:**
+```markdown
+## Divergences
+- Plan specified: [X]
+- Actual: [Y]
+- Reason: [mechanically necessary because...]
+```
 
 **If no divergences:**
-Write: `"Plan implemented as specified. No divergences."`
-
-Notes are factual only and have **no authority**.
-
-**MANDATORY: Create this file after completing implementation, before reporting completion.**
+```markdown
+Plan implemented as specified. No divergences.
+```
 
 ---
 
@@ -104,13 +89,14 @@ Notes are factual only and have **no authority**.
 
 ---
 
-## Implementation Exit
+## Verification
 
-**VERIFICATION (MANDATORY):**
 Confirm `/obelisk/temp-state/implementation-notes.md` exists.
-If NOT → STOP → Output: `"IMPLEMENTATION FAILED — implementation-notes.md not created"`
 
-> "IMPLEMENTATION COMPLETE
+- **If missing:** → "❌ IMPLEMENTATION FAILED — implementation-notes.md not created" → STOP
+
+**Success:**
+> "✓ IMPLEMENTATION COMPLETE — `implementation-notes.md` created"
 >
 > `/review-task` — run review
 > `/abort-task` — Cancel and archive progress
