@@ -1,10 +1,10 @@
 ---
-description: Update existing task based on user feedback
+description: Update frozen task based on user feedback
 ---
 
 **CURRENT STATE: TASK UPDATE**
 
-Modify existing task and re-run discovery with changes.
+Modify frozen task and re-run discovery with changes.
 
 ---
 
@@ -38,19 +38,24 @@ Read `/obelisk/temp-state/task.md`
 
 If NOT exist → Output: "No task to update. Use /new-task first."
 
-### 2. Delete Current Task
+### 2. Apply Changes to Task
+
+**Integrate update_description into current task:**
+
+- If update adds to scope → Add to included items
+- If update removes from scope → Move to excluded or remove
+- If update changes goal → Modify goal statement
+- If update adds constraints → Add to constraints
+- If update changes success criteria → Update criteria
+
+**Create clear, updated task description** that incorporates changes naturally.
+
+**Do NOT ask questions. Just apply the changes logically.**
+
+### 3. Delete Current Task
 
 Delete `/obelisk/temp-state/task.md`
 
-### 3. Create Combined Description
-```
-Original task:
-[Content from task.md]
+### 4. Run Discovery with Updated Task
 
-Requested changes:
-[update_description]
-```
-
-### 4. Run Discovery
-
-Execute: `/new-task [combined description from step 3]`
+Execute: `/new-task [updated task description from step 2]`
