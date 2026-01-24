@@ -251,6 +251,7 @@ Options: (1) Database, (2) Redis, (3) Memory, (4) File system"
 - If uncertain, skip recommendation
 
 **Goal:** Every question includes guidance based on evidence.
+
 ---
 
 **CURRENT STATE: TASK FREEZE**
@@ -259,11 +260,46 @@ Freeze intent, and prepare for execution.
 
 **After discovery questions complete (or immediate convergence):**
 
-### 1. Project Knowledge Updates
+---
+
+### 1. Create task.md
+
+Write to `/obelisk/temp-state/task.md`:
+```markdown
+# Task: [One-line descriptive name]
+
+## Goal
+[What must be achieved and why - from summary]
+
+## Scope
+✓ Included: [from summary]
+✗ Excluded: [from summary]
+
+## Constraints
+- [Contracts to preserve - from summary]
+- [Technical/business limits - from summary]
+
+## Success Criteria
+- [Observable completion signals - from summary]
+
+## Open Questions (if any)
+- [Unresolved ambiguities - from summary]
+```
+
+---
+
+
+### 2. Verify Creation
+
+**MANDATORY:** Confirm `/obelisk/temp-state/task.md` exists.
+
+If NOT → STOP → `"TASK FREEZE FAILED — task.md not created"`
+
+---
+
+### 3. Project Knowledge Updates
 
 **Execute approved updates from validation/discovery:**
-
-### 1. Apply Project Updates
 
 **Contract updates:**
 
@@ -291,7 +327,7 @@ Output: "✓ Project knowledge updated" (if updates made)
 
 ---
 
-### 2. Present Summary
+### 4. Present Summary
 
 Display task summary for final review:
 ```markdown
@@ -317,48 +353,11 @@ Display task summary for final review:
 - [Unresolved item 1]
 ```
 
-**Proceed to create task.md? [yes/corrections]**
 
-**If "corrections":**
-- User provides feedback
-- Update understanding
-- Re-present summary
-- Repeat until approved
-
-**If "yes":**
-- Proceed to step 2 (Create task.md)
 
 ---
 
-### 3. Create task.md
 
-Write to `/obelisk/temp-state/task.md`:
-```markdown
-# Task: [One-line descriptive name]
-
-## Goal
-[What must be achieved and why - from summary]
-
-## Scope
-✓ Included: [from summary]
-✗ Excluded: [from summary]
-
-## Constraints
-- [Contracts to preserve - from summary]
-- [Technical/business limits - from summary]
-
-## Success Criteria
-- [Observable completion signals - from summary]
-
-## Open Questions (if any)
-- [Unresolved ambiguities - from summary]
-```
-
-### 4. Verify Creation
-
-**MANDATORY:** Confirm `/obelisk/temp-state/task.md` exists.
-
-If NOT → STOP → `"TASK FREEZE FAILED — task.md not created"`
 
 ### 5. Display Task & Options
 ```
@@ -369,11 +368,11 @@ If NOT → STOP → `"TASK FREEZE FAILED — task.md not created"`
 **Options:**
 `/execute` — Auto-run to completion (plan → implement → review → archive)
 `/execute-guided` — Stop at plan and review for approval
-`/update-task [changes]` — Modify task definition
+`/update-task [suggested update]` — Modify task definition
 `/abort` — Cancel and archive progress
 ```
 
 **STOP. Wait for user command.**
 
 **If user provides corrections instead of command:**
-Treat as implicit `/update-task` request.
+Treat as implicit `/update-task` [corrections] request.
