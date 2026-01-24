@@ -4,81 +4,54 @@ description: Update existing task based on user feedback
 
 **CURRENT STATE: TASK UPDATE**
 
-Modify existing task and re-run discovery with changes.
+Modify the frozen task by merging existing state with new requirements, then re-verify.
 
 ---
 
-## Entry Point Detection
+## 1. Entry Point & Input
 
-**Check if update description was provided:**
-
-**IF user provided update:**
-```
-/update-task Add camera support alongside gallery picker
-```
-- Extract update_description = "Add camera support alongside gallery picker"
-- Proceed to Task Update
-
-**IF no description:**
-```
-/update-task
-```
-- Output: "What changes should be made to the task?"
-- Wait for response
-- Set update_description = [response]
-- Proceed to Task Update
+**Check input:**
+- `/update-task [description]` → `update_req` = description
+- `/update-task` (empty) → Ask: "What changes are required?" → Wait → `update_req` = response
 
 ---
 
-## Task Update
+## 2. Context Synthesis (The Fix)
 
-### 1. Load Current Task
+**Action:** Read `/obelisk/temp-state/task.md`.
 
-Read `/obelisk/temp-state/task.md`
+**IF file missing:**
+- Output: "❌ No task to update. Use `/new-task`." → STOP.
 
-If NOT exist → Output: "No task to update. Use /new-task first."
+**IF file exists:**
+- Construct the **Refinement Prompt** in memory (do not output):
 
-### 2. Apply Changes to Task
+> **ROLE:** You are refining a previously defined task.
+>
+> **BASE STATE (Preserve unless modified):**
+> [Insert full content of task.md]
+>
+> **MODIFICATION REQUEST (Authority on conflict):**
+> "[Insert update_req]"
+>
+> **INSTRUCTION:**
+> 1. Apply the Modification Request to the Base State.
+> 2. If scope is removed, also remove associated constraints/criteria.
+> 3. If scope is added, imply necessary constraints.
+> 4. Resolve conflicts in favor of the Modification Request.
+> 5. Treat the result as the intended task definition.
 
-**Integrate update_description into current task:**
+---
 
-**If update adds to scope:**
-- Add to included items
-- Remove from excluded if it was there
+## 3. Reset & Restart
 
-**If update removes from scope:**
-- Remove from included items
-- Add to excluded items (explicitly mark as rejected)
+**Action:**
+1. **DELETE** `/obelisk/temp-state/task.md` (Clean slate for re-freeze).
+2. **LOAD** `/obelisk/prompts/03-task-discovery-prompt.md`.
 
-**If update changes goal:**
-- Modify goal statement
+**Execution:**
+1. **Inject Input:** Pass the **Refinement Prompt** (from Step 2) as the user's input.
+2. **Adopt Persona:** Switch immediately to Task Discovery.
+3. **Shortcut:** If the update is simple/unambiguous, skip the "Questioning" phase and proceed directly to "Task Freeze".
 
-**If update adds constraints:**
-- Add to constraints list
-
-**If update changes success criteria:**
-- Update criteria accordingly
-
-**If update rejects something previously included:**
-- Move to excluded list with note: "Explicitly excluded by user"
-
-**Create clear, updated task description** that:
-- Incorporates requested changes
-- Explicitly excludes rejected items
-- Prevents re-asking about rejected items
-
-**Do NOT ask questions. Apply changes logically.**
-
-### 3. Delete Current Task
-
-Delete `/obelisk/temp-state/task.md`
-
-### 4. Run Discovery with Updated Task
-
-**ACTION:**
-1. Read the file `/obelisk/prompts/03-task-discovery-prompt.md`.
-2. **Adopt the persona** and rules defined in that file immediately.
-3. **Inject Input:** Treat the updated task description (from Step 2) as the user's initial input.
-4. **Execute:** Begin the "Preflight" and "Reconnaissance" phases defined in that file.
-
-*Do not ask the user to type /new-task. Just start the process.*
+**GOAL:** Produce a new `task.md` that is a seamless evolution of the old one.
