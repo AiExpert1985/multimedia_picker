@@ -1,5 +1,5 @@
 ---
-description: Archive task and clean workspace
+description: Archive task & clean workspace
 ---
 
 **CURRENT STATE: TASK ARCHIVE**
@@ -44,11 +44,9 @@ Extract `[task-name]` from task.md header.
 
 ---
 
-## Protected State
-
 MUST NOT modify or delete:
 - `/obelisk/state/*`
-/obelisk/guidelines/ai-engineering.md
+- `/obelisk/guidelines/ai-engineering.md`
 - Source code
 - Git history
 

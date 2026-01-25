@@ -80,3 +80,18 @@ Execution constraints for code quality, architecture, security, and research.
 - Use environment variables for credentials
 - Verify dependency compatibility before use
 - Flag security risks explicitly in implementation notes
+
+## Test Writing Strategy
+
+**Default: Write tests for public contracts only, not internals.**
+
+| Do | Don't |
+|---|---|
+| Write tests for behaviors in `*.domain.md` | Write tests for private/internal methods |
+| Write tests for public API responses | Run full test suite during implementation |
+| Write tests for critical business invariants | Evaluate coverage percentages |
+
+**Rules:**
+- Write tests only if required by the task or plan
+- Write only task-relevant tests (full suite only if Plan requires "Run Regression Tests")
+- Review verifies test *presence* and *intent*, not coverage or style

@@ -1,5 +1,5 @@
 ---
-description: Validate implementation matches frozen intent
+description: Validate implementation
 ---
 
 **CURRENT STATE: TASK REVIEW**
@@ -50,6 +50,16 @@ Any failure → **CHANGES REQUIRED**
 3. **Contracts:** All preserved in actual code?
 4. **Scope:** Only files listed in plan were changed?
 5. **Divergences:** Any noted in implementation-notes.md justified?
+6. Testing (if in scope)
+   - [ ] Required tests exist
+   - [ ] Tests protect stated intent (not implementation)
+
+### Review Exclusions
+
+Do NOT evaluate:
+- Test quality or style
+- Coverage percentages
+- Tests outside task scope
 
 ---
 
@@ -91,5 +101,3 @@ Confirm `/obelisk/temp-state/review-notes.md` exists.
 > "✓ REVIEW COMPLETE — Status: [APPROVED|CHANGES REQUIRED]"
 
 *Review always proceeds to archive regardless of status.*
-
-Load `/.agent/workflows/archive-task.md`

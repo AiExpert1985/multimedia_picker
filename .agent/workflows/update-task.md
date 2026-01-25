@@ -1,5 +1,5 @@
 ---
-description: Update existing task based on user feedback
+description: Update existing task
 ---
 
 **CURRENT STATE: TASK UPDATE**

@@ -1,5 +1,5 @@
 ---
-description: Initialize new Obelisk project through discovery
+description: Initialize new Obelisk project
 ---
 
 **CURRENT STATE: PROJECT START**
@@ -171,4 +171,4 @@ Confirm all files created:
 > - `tech-memory.md`
 > - `project-backlog.md`
 >
-> Next: `/new-task` — Start building the first feature or `/suggest-tasks` — AI suggests tasks based on the project knowledge"
+> Next: `/new-task` — Start building the first feature or `/suggest-task` — AI suggests tasks based on the project knowledge"

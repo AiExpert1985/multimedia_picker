@@ -1,5 +1,5 @@
 ---
-description: Auto-execute all phases after task definition
+description: Auto-execute task until the end
 ---
 
 **CURRENT STATE: EXECUTE**
@@ -23,7 +23,7 @@ For each phase: **Read the prompt file, treat content as instructions, execute.*
 |-------|--------|---------------------|
 | 1. Plan | `/.agent/workflows/plan-task.md` | `plan.md` exists |
 | 2. Implement | `/.agent/workflows/implement-task.md` | `implementation-notes.md` exists |
-| 3. Review | `/.agent/workflows/review-task.md` | `review-notes.md` contains "APPROVED" |
+| 3. Review | `/.agent/workflows/review-task.md` | `review-notes.md` exists |
 | 4. Archive | `/.agent/workflows/archive-task.md` | `/obelisk/temp-state/` is empty |
 
 **Logic Rules:**

@@ -14,6 +14,8 @@ Execute the approved plan sequentially and deterministically.
 - `/obelisk/temp-state/task.md`
 - `/obelisk/temp-state/plan.md`
 
+→ "❌ IMPLEMENTATION BLOCKED — Missing file: [path]"
+
 **Read if present:**
 - `/obelisk/state/*.domain.md` (contracts)
 - `/obelisk/state/tech-memory.md`
@@ -35,6 +37,14 @@ Execute the approved plan sequentially and deterministically.
 - Modify contracts or tech-memory files
 - Ask questions
 - Continue after a STOP condition
+
+
+### Testing
+
+- Write or modify tests only if required by the plan
+- Do NOT add tests opportunistically
+- Run only task-relevant tests, not the full suite
+
 
 ---
 

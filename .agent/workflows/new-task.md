@@ -88,105 +88,122 @@ After loading contracts, before validation:
 
 ---
 
-## Contract Validation (After Reconnaissance)
+## Discovery Questions
 
-**Internal analysis (silent):**
-- Check task against all loaded contracts
-- Identify conflicts (blocking)
-- Identify missing contracts (optional)
-
-**Output to user ONLY if action needed:**
-
-### No Issues
-→ Continue silently to Discovery Questions
+**After Code Reconnaissance:**
 
 ---
 
-### Contract Conflict
+### Set 1: Understanding (MANDATORY)
+
+**Purpose:** Clarify the task. Contracts and testing noted internally, not asked yet.
+
+**Always ask at least one question**, even if task seems clear.
+
+**📌 Questions:**
+- What, why, for whom
+- Success criteria (observable completion signals)
+- Scope boundaries (what's in/out)
+- Key constraints or dependencies
+
+**Internal (silent):**
+- Note potential contract conflicts for Set 2
+- Note testing implications for Set 2
+
+**After Set 1:**
+> "Understanding complete."
+
+→ If task fully clear, no contract changes needed, no testing needed: Proceed to Task Freeze
+→ Otherwise: Continue to Set 2
+
+---
+
+### Set 2: Refinement (If Needed)
+
+**Purpose:** Resolve remaining issues in organized groups.
+
+**Each group may be skipped if no issues were detected.**
+
+Present questions in three sequential groups:
+
+---
+
+**📌 Group 1: Clarification** (if gaps remain)
+
+- Resolve ambiguities from Set 1
+- Edge cases needing user input
+- Approach selection when multiple valid options
+- Flag if task should be split
+
+*Skip if no clarification needed.*
+
+---
+
+**📋 Group 2: Contracts** (if issues detected)
+
+Check task against all loaded contracts with full context from Set 1.
+
+**If conflict found:**
 ```
 ⚠️ **Contract Conflict**
 
 Task: [specific step that conflicts]
-Conflicts with: [domain].domain.md - "[exact contract text]"
+Conflicts with: [domain].domain.md — "[exact contract text]"
 
 **Options:**
+1. **Update task** — [what changes]
+2. **Update contract** — [what exception needed]
 
-1. **Update task** - [Brief: what would change in task to comply]
-   Example: "Remove guest checkout, require login"
-
-2. **Update contract** - [Brief: what exception/change needed]
-   Example: "Add exception: guest checkout allowed for /api/checkout"
-
-**Recommendation:** [Option X] because [brief reason based on context]
-Example: "Option 1—preserves security contract, simpler implementation"
+**Recommendation:** [Option] because [reason]
 
 Choose: [1/2]
 ```
 
-Resolve based on choice. Continue checking for other issues.
-
----
-
-### Missing Contracts
-
-**Suggest ONLY for:**
-- Business-critical rules (security, data integrity, compliance)
-- System-wide invariants
-- Permanent architectural constraints
-
-**NOT for:** Implementation details, task-specific logic, obvious rules
-
-**If needed:**
+**If new contract needed** (ONLY for business-critical rules):
 ```
 📋 **Contract Addition**
 
 Task introduces: [critical functionality]
 
 Suggested for [domain].domain.md:
-- [Rule - why contract-worthy]
+— [Rule — why contract-worthy]
 
 Add? [yes/no]
 ```
 
-Note user's response. Continue checking for other issues.
+*Skip if no contract issues.*
 
 ---
 
-**Resolve ALL validation issues before proceeding to Discovery Questions.**
+**🧪 Group 3: Testing** (if task affects contracts)
 
-**Approved changes applied during Task Freeze.**
+Suggest tests only if task affects contracts or critical behavior.
+If user has testing policy in tech-memory.md → follow that, skip question.
+
+```
+🧪 **Testing Scope**
+
+This task affects: [contract/critical behavior]
+
+Suggested tests (contract-level):
+- [Test: what it verifies]
+- [Test: what it verifies]
+
+Excluded (per ai-engineering.md):
+- Internal implementation details
+- Full unit coverage
+
+Include? [yes/no/modify]
+```
+
+*Skip if task doesn't affect contracts.*
 
 ---
 
-## Discovery Questions
+**After Set 2:**
+> "Discovery complete."
 
-**After Contract Validation:**
-
-### Immediate Convergence (Optional)
-
-Skip questions if ALL true:
-- Task clear (intent, scope, success criteria explicit)
-- No contract conflicts (or already resolved)
-- No architectural concerns
-- No significant ambiguities
-
-→ Proceed directly to Task Freeze
-
-### Discovery Discussion (If Needed)
-
-**Phase 1: Initial Understanding**
-- What, why, for whom
-- Success criteria (observable completion signals)
-- Scope boundaries (what's in/out)
-- Key constraints or dependencies
-
-**Phase 2: Refinement (only if needed)**
-- Resolve ambiguities
-- Surface risks or contract conflicts
-- Flag if task should be split
-- Clarify approach when multiple valid options
-
-**After clarification, proceed to Task Freeze.**
+→ Proceed to Task Freeze
 
 ---
 
@@ -250,9 +267,9 @@ Options: (1) Database, (2) Redis, (3) Memory, (4) File system"
 
 ---
 
-**CURRENT STATE: TASK FREEZE**
+## TASK FREEZE (MANDATORY)
 
-**After discovery questions complete (or immediate convergence):**
+**After discovery complete — execute ALL steps below:**
 
 ### 1. Apply Project Updates
 
@@ -298,9 +315,18 @@ Write to `/obelisk/temp-state/task.md`:
 ## Success Criteria
 - [Observable completion signals]
 
+## Testing Intent (Optional)
+- Required: Yes | No
+- Scope:
+  - [What to test]
+- Excluded:
+  - [What not to test]
+
 ## Open Questions (if any)
 - [Unresolved ambiguities]
 ```
+
+*Omit Testing Intent section if user declined tests or default policy applies.*
 
 ---
 
@@ -314,23 +340,22 @@ If NOT → STOP → `"TASK FREEZE FAILED — task.md not created"`
 
 ### 4. Display Task & Options
 
-**Obelisk: Task Ready:**
+**Obelisk: Task Ready**
 
-**Intent:** [One sentence from Goal]  
-**Scope:** ✓ [Key inclusions] ✗ [Key exclusions]  
-**Success:** [Primary completion signal]
+| | |
+|---|---|
+| **Task** | [One-line name from header] |
+| **Goal** | [One sentence] |
+| **Scope** | ✓ [2-3 key inclusions] ✗ [1-2 key exclusions] |
+| **Success** | [Primary completion signal] |
+| **Testing** | [Yes — N tests / No / Default] |
 
----
-
-**Full task definition:** /obelisk/temp-state/task.md
-
-
-[Display complete task.md contents inline]
+**Full definition:** `/obelisk/temp-state/task.md`
 
 **Options:**
-`/update-task [changes]` — Modify task definition
-`/execute-task` — Auto-run to completion (plan → implement → review → archive)
-`/plan-task` — run plan phase only and stop
-`/abort-task` — Cancel and archive progress
+- `/execute` — Auto-run to completion (plan → implement → review → archive)
+- `/plan-task` — Run plan phase only and stop
+- `/update-task [changes]` — Modify task definition
+- `/abort-task` — Cancel and archive progress
 
 **STOP. Wait for user command.**

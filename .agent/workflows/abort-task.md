@@ -1,5 +1,5 @@
 ---
-description: Archive current task state and clean workspace
+description: Abort & document current task
 ---
 
 **CURRENT STATE: TASK ABORT**

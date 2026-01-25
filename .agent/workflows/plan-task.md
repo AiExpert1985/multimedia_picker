@@ -1,5 +1,5 @@
 ---
-description: Create execution plan from frozen task
+description: Create execution plan
 ---
 
 **CURRENT STATE: TASK PLANNING**
@@ -31,6 +31,13 @@ Read all `/obelisk/state/*.domain.md` contracts.
 - Invent requirements or features
 - Make unstated assumptions
 - Write code or ask questions
+
+### Testing
+
+- If Testing Intent is specified in `task.md` → include only tests explicitly required
+- If Testing Intent is omitted → follow defaults in `ai-engineering.md`
+- Do NOT introduce additional tests or expand testing scope
+
 
 ---
 
