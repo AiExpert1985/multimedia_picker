@@ -30,6 +30,7 @@ class FileService {
       final int freeSpace = await platform.invokeMethod('getStorageFreeSpace');
       return freeSpace;
     } on PlatformException catch (e) {
+      // ignore: avoid_print
       print("Failed to get storage space: '${e.message}'.");
       return 0;
     }
