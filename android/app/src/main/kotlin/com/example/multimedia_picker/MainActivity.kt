@@ -1,11 +1,13 @@
 package com.example.multimedia_picker
 
 import android.app.Activity
+import android.content.ContentUris
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.os.StatFs
+import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.util.Log
 import io.flutter.embedding.android.FlutterActivity
@@ -46,6 +48,65 @@ class MainActivity : FlutterActivity() {
         return availableBlocks * blockSize
     }
 
+    /**
+     * Converts a Document Provider URI to a proper MediaStore URI.
+     * Document Provider URIs (e.g., content://com.android.providers.media.documents/document/image:123)
+     * must be converted to MediaStore URIs (e.g., content://media/external/images/media/123)
+     * for use with MediaStore.createDeleteRequest().
+     */
+    private fun convertToMediaStoreUri(uri: Uri): Uri {
+        val authority = uri.authority ?: return uri
+        
+        // Check if this is a media documents provider URI
+        if (!authority.contains("media.documents")) {
+            Log.d(TAG, "Not a media documents URI, using as-is: $uri")
+            return uri
+        }
+
+        try {
+            // Extract the document ID (e.g., "image:123" or "video:456")
+            val docId = DocumentsContract.getDocumentId(uri)
+            Log.d(TAG, "Document ID extracted: $docId")
+            
+            // Split into type and numeric ID
+            val split = docId.split(":")
+            if (split.size != 2) {
+                Log.w(TAG, "Unexpected document ID format: $docId")
+                return uri
+            }
+            
+            val type = split[0]
+            val id = split[1].toLongOrNull()
+            if (id == null) {
+                Log.w(TAG, "Could not parse numeric ID from: ${split[1]}")
+                return uri
+            }
+            
+            // Build the proper MediaStore URI based on media type
+            val mediaStoreUri = when (type) {
+                "image" -> ContentUris.withAppendedId(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id
+                )
+                "video" -> ContentUris.withAppendedId(
+                    MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id
+                )
+                "audio" -> ContentUris.withAppendedId(
+                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id
+                )
+                else -> {
+                    Log.w(TAG, "Unknown media type: $type, using original URI")
+                    return uri
+                }
+            }
+            
+            Log.d(TAG, "Converted URI: $uri -> $mediaStoreUri")
+            return mediaStoreUri
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to convert URI: $uri", e)
+            return uri
+        }
+    }
+
     private fun deleteOriginal(uriString: String, result: MethodChannel.Result) {
         Log.d(TAG, "deleteOriginal called with URI: $uriString")
         
@@ -70,17 +131,21 @@ class MainActivity : FlutterActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && uri.scheme == "content") {
             Log.d(TAG, "Using MediaStore.createDeleteRequest for Android R+")
             try {
+                // Convert Document Provider URI to MediaStore URI if needed
+                val mediaStoreUri = convertToMediaStoreUri(uri)
+                Log.d(TAG, "Using MediaStore URI for deletion: $mediaStoreUri")
+                
                 // Verify the URI exists in MediaStore before requesting deletion
-                val cursor = contentResolver.query(uri, arrayOf(MediaStore.MediaColumns._ID), null, null, null)
+                val cursor = contentResolver.query(mediaStoreUri, arrayOf(MediaStore.MediaColumns._ID), null, null, null)
                 if (cursor == null || !cursor.moveToFirst()) {
                     cursor?.close()
-                    Log.e(TAG, "File not found in MediaStore: $uriString")
+                    Log.e(TAG, "File not found in MediaStore: $mediaStoreUri")
                     result.error("FILE_NOT_FOUND", "File not found in MediaStore. It may have been already deleted.", null)
                     return
                 }
                 cursor.close()
 
-                val uris = listOf(uri)
+                val uris = listOf(mediaStoreUri)
                 val pi = MediaStore.createDeleteRequest(contentResolver, uris)
                 deleteResult = result
                 startIntentSenderForResult(pi.intentSender, DELETE_REQUEST_CODE, null, 0, 0, 0)
@@ -152,4 +217,5 @@ class MainActivity : FlutterActivity() {
         }
     }
 }
+
 
