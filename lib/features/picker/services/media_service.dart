@@ -41,9 +41,7 @@ class MediaService {
   }
 
   Future<void> deleteOriginal(String originalPathOrUri) async {
-    final success = await _fileService.deleteOriginalFile(originalPathOrUri);
-    if (!success) {
-      throw Exception("Failed to delete original file");
-    }
+    // FileService.deleteOriginalFile now throws descriptive exceptions on failure
+    await _fileService.deleteOriginalFile(originalPathOrUri);
   }
 }

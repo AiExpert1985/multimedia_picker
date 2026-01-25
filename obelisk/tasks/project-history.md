@@ -1,0 +1,7 @@
+# Project History
+
+## 2026-01-26 | Fix Media Deletion Failure on Android | APPROVED
+Type: —
+Scope: —
+Goal: Fix the "Deletion Failed: Exception: Failed to delete original file" error that occurs after copying media files.
+Deferred: iOS implementation remains a future task

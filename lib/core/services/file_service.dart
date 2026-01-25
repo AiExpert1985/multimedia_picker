@@ -93,28 +93,46 @@ class FileService {
   }
 
   /// Deletes the original file via native platform channel
-  /// Returns true if deletion was successful, false otherwise
+  /// Returns true if deletion was successful
+  /// Throws Exception with descriptive message on failure
   Future<bool> deleteOriginalFile(String filePath) async {
     try {
-      // Try native deletion first (for gallery integration)
+      // Use native deletion for MediaStore/Gallery files
       final bool? result = await platform.invokeMethod('deleteOriginal', {
         'uri': filePath,
       });
       if (result == true) {
         return true;
       }
-
-      // Fallback to standard Dart delete if native method fails or returns false
-      // This handles cases where filePath is a standard path we own
-      final file = File(filePath);
-      if (await file.exists()) {
-        await file.delete();
-        return true;
-      }
-      return false;
+      // Native returned false without throwing - shouldn't happen with new code
+      throw Exception('Deletion failed: Unknown error');
+    } on PlatformException catch (e) {
+      // Native code threw an error with descriptive message
+      // Error codes: URI_INVALID, FILE_NOT_FOUND, PERMISSION_DENIED, USER_CANCELLED, DELETE_FAILED
+      final errorMessage = _getReadableErrorMessage(e.code, e.message);
+      throw Exception(errorMessage);
     } catch (e) {
-      print("Error deleting file: $e");
-      return false;
+      // Re-throw if already an Exception, otherwise wrap
+      if (e is Exception) rethrow;
+      throw Exception('Deletion failed: $e');
+    }
+  }
+
+  /// Converts error codes to user-friendly messages
+  String _getReadableErrorMessage(String code, String? message) {
+    switch (code) {
+      case 'URI_INVALID':
+        return 'Invalid file reference: ${message ?? "The file URI is malformed"}';
+      case 'FILE_NOT_FOUND':
+        return 'File not found: ${message ?? "The file may have already been deleted"}';
+      case 'PERMISSION_DENIED':
+        return 'Permission denied: ${message ?? "Unable to delete this file"}';
+      case 'USER_CANCELLED':
+        return 'Deletion cancelled by user';
+      case 'DELETE_FAILED':
+        return 'Deletion failed: ${message ?? "Unknown error occurred"}';
+      default:
+        return message ?? 'Deletion failed: $code';
     }
   }
 }

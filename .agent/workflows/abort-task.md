@@ -65,8 +65,6 @@ Check `/obelisk/temp-state/`.
 If task.md existed, append to `/obelisk/tasks/project-history.md`:
 ```markdown
 ## YYYY-MM-DD | [task-name] | ABORTED
-Type: [From task.md if stated, else "—"]
-Scope: [From task.md if stated, else "—"]
 Goal: [One-line goal from task.md, or "Task undefined"]
 Reason: [Abort reason from step 1]
 ```
