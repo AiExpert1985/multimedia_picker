@@ -30,6 +30,7 @@ Understand the project through discussion. **No files created yet.**
 - Core invariants (rules that must always hold)
 - Global constraints (apply to all future work)
 - Safety, data correctness, or irreversible risk
+- Technology boundaries (target platforms, languages)
 
 **Skip:**
 - Rare edge cases

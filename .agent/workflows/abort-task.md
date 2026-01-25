@@ -60,7 +60,24 @@ Check `/obelisk/temp-state/`.
 
 ---
 
-## 4. Output
+## 4. Update Project History
+
+If task.md existed, append to `/obelisk/tasks/project-history.md`:
+```markdown
+## YYYY-MM-DD | [task-name] | ABORTED
+Type: [From task.md if stated, else "—"]
+Scope: [From task.md if stated, else "—"]
+Goal: [One-line goal from task.md, or "Task undefined"]
+Reason: [Abort reason from step 1]
+```
+
+Create file with header `# Project History` if it doesn't exist.
+
+Skip if no task.md existed (nothing meaningful to log).
+
+---
+
+## 5. Output
 
 ```
 🛑 TASK ABORTED

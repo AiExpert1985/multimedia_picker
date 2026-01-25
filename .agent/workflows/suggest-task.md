@@ -24,19 +24,20 @@ Help the user choose the next task to work on.
 ### A. Explicit Intent
 - `/obelisk/tasks/project-backlog.md`
 
-### B. Completed Task Sequence (Last 10 Only)
-Scan `/obelisk/tasks/completed/` directories:
-- Sort by filename date (YYYYMMDD prefix)
-- **Read only the most recent 10 tasks** (older history is less relevant)
-
-**For each task, read ONLY:**
-- `task.md` → Header and Goal section
-- `review-notes.md` → "Deferred Items" section only
+### B. Project History
+- `/obelisk/tasks/project-history.md`
 
 **Extract:**
-1. Task sequence pattern (what order did user build features?)
+1. Task sequence pattern (chronological order, types, scopes)
 2. Deferred items (explicit carry-over work)
 3. Completed work (to exclude from suggestions)
+4. Aborted/rejected patterns (potential retry candidates)
+
+**If file missing or empty:**
+- Note: "No task history yet—suggestions based on backlog and code analysis."
+- Skip sequence analysis
+
+**Do NOT scan `/obelisk/tasks/completed/` directories.** History file is authoritative for suggestions.
 
 ### C. Constraints
 - `/obelisk/state/*.domain.md`

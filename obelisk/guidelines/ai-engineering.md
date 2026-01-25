@@ -52,19 +52,10 @@ Execution constraints for code quality, architecture, security, and research.
 - Consult official documentation for recommended usage
 - If uncertain about API correctness, flag explicitly in implementation notes
 
-**Flutter-specific requirements:**
-- Use Riverpod 3.0+ (NOT 2.x or legacy)
-- Follow Riverpod 3.x recommendations and patterns (do NOT use legacy classes or APIs)
-- Use GoRouter for navigation
-- Verify current API patterns for both libraries before use
-
 **Research required for:**
 - Any new dependency
 - Unfamiliar or deprecated APIs
 - Non-obvious integration patterns
-
-**Documentation:**
-- Log library version, source, and justification in implementation notes
 
 ---
 

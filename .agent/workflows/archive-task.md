@@ -44,6 +44,23 @@ Extract `[task-name]` from task.md header.
 
 ---
 
+## 4. Update Project History
+
+Append to `/obelisk/tasks/project-history.md`:
+```markdown
+## YYYY-MM-DD | [task-name] | [APPROVED|REJECTED|ABORTED]
+Type: [From task.md if stated, else "—"]
+Scope: [From task.md if stated, else "—"]
+Goal: [One-line goal from task.md]
+Deferred: [From review-notes.md if present, else "None"]
+```
+
+Create file with header `# Project History` if it doesn't exist.
+
+**Note:** Extract Type/Scope from task.md only. Do not infer.
+
+---
+
 MUST NOT modify or delete:
 - `/obelisk/state/*`
 - `/obelisk/guidelines/ai-engineering.md`
